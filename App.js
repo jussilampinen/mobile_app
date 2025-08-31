@@ -1,24 +1,32 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, FlatList, } from 'react-native';
 import React, { useState } from "react";
 
 export default function App() {
   const [num1, setNum1] = useState("");
   const [num2, setNum2] = useState("");
   const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
 
   const calculate = (op) => {
     const a = Number(num1);
     const b = Number(num2);
+    let res = null;
+    let expression = "";
     if (op === "+") {
-      setResult(a + b);
+      res = a + b;
+      expression = `${a} + ${b} = ${res}`;
     } else if (op === "-") {
-      setResult(a - b);
+      res = a - b;
+      expression = `${a} - ${b} = ${res}`;
     }
+
+    setResult(res);
+    setHistory([...history, expression]);
   }
 
   return (
-     <View style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Laskin</Text>
 
       <TextInput
@@ -37,17 +45,22 @@ export default function App() {
         onChangeText={setNum2}
       />
 
-      <View style={styles.buttonRow}>
-        <View style={styles.button}>
-          <Button title="+" onPress={() => calculate("+")} />
-        </View>
-        <View style={styles.button}>
-          <Button title="-" onPress={() => calculate("-")} />
-        </View>
+      <View style={{ flexDirection: 'row', justifyContent: "space-around", alignItems: "center", width: "20%" }}>
+        <Button title="+" onPress={() => calculate("+")} />
+        <Button title="-" onPress={() => calculate("-")} />
       </View>
 
-      {result !== null && <Text style={styles.result}>Tulos: {result}</Text>}
-    </View>
+      {result !== null && <Text style={styles.result}>Result: {result}</Text>}
+
+      <View style={{ flex: 1, height: 20 }}>
+        <Text style={{ fontWeight: "bold"}}>History</Text>
+        <FlatList
+          data={history}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <Text>{item}</Text>}
+        />
+      </View>
+    </View >
   );
 }
 
@@ -57,5 +70,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 100,
   },
 });
